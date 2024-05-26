@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { experimentalStyled as styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -19,6 +20,15 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function ResponsiveGrid() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("https://ecommerceappbackend-obm7.onrender.com/api/products")
+      .then(response => response.json())
+      .then(data => setProducts(data))
+      .catch(error => console.error("Error fetching products:", error));
+  }, []);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid
@@ -26,19 +36,15 @@ export default function ResponsiveGrid() {
         spacing={{ xs: 2, md: 3 }}
         columns={{ xs: 4, sm: 8, md: 12 }}
       >
-        {Array.from(Array(12)).map((_, index) => (
-          <Grid item xs={2} sm={4} md={3} key={index}>
+        {products.map((product) => (
+          <Grid item xs={2} sm={4} md={3} key={product.id}>
             <Item>
               <Card sx={{ width: 320 }}>
                 <div>
-                  <Typography level="title-lg">
-                    Yosemite National Park
-                  </Typography>
-                  <Typography level="body-sm">
-                    April 24 to May 02, 2021
-                  </Typography>
+                  <Typography level="title-lg">{product.name}</Typography>
+                  <Typography level="body-sm">{product.description}</Typography>
                   <IconButton
-                    aria-label="bookmark Bahamas Islands"
+                    aria-label={`bookmark ${product.name}`}
                     variant="plain"
                     color="neutral"
                     size="sm"
@@ -51,26 +57,26 @@ export default function ResponsiveGrid() {
                     <BookmarkAdd />
                   </IconButton>
                 </div>
-                <AspectRatio minHeight="120px" maxHeight="200px">
+                <AspectRatio minHeight="200px" maxHeight="200px">
                   <img
-                    src="https://images.unsplash.com/photo-1527549993586-dff825b37782?auto=format&fit=crop&w=286"
-                    srcSet="https://images.unsplash.com/photo-1527549993586-dff825b37782?auto=format&fit=crop&w=286&dpr=2 2x"
+                    src={product.image}
+                    srcSet={`${product.image} 2x`}
                     loading="lazy"
-                    alt=""
+                    alt={product.name}
                   />
                 </AspectRatio>
                 <CardContent orientation="horizontal">
                   <div>
-                    <Typography level="body-xs">Total price:</Typography>
+                    <Typography level="body-xs">Price:</Typography>
                     <Typography fontSize="lg" fontWeight="lg">
-                      $2,900
+                      ${product.price}
                     </Typography>
                   </div>
                   <Button
                     variant="solid"
                     size="md"
                     color="primary"
-                    aria-label="Explore Bahamas Islands"
+                    aria-label={`Explore ${product.name}`}
                     sx={{ ml: "auto", alignSelf: "center", fontWeight: 600 }}
                   >
                     Explore
