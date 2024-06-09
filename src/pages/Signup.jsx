@@ -26,6 +26,7 @@ function Copyright(props) {
 }
 
 const defaultTheme = createTheme();
+const url = "http://localhost:4000";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export default function SignUp() {
     };
 
     try {
-      const response = await fetch('https://ecommerceappbackend-obm7.onrender.com/api/auth/register', {
+      const response = await fetch(`${url}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

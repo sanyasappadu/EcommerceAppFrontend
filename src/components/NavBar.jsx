@@ -38,6 +38,9 @@ const Navbar = () => {
           <Link to="/wishlist" className="link-component">
             <Button color="inherit">Wishlist</Button>
           </Link>
+          <Link to="/cart" className="link-component">
+            <Button color="inherit">Cart</Button>
+          </Link>
           {isLoggedIn ? (
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           ) : (
@@ -45,6 +48,7 @@ const Navbar = () => {
               <Button color="inherit">Login</Button>
             </Link>
           )}
+          
         </Toolbar>
       </AppBar>
     </ThemeProvider>

@@ -18,12 +18,13 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
   color: theme.palette.text.secondary,
 }));
+const url = "http://localhost:4000";
 
 export default function ResponsiveGrid() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://ecommerceappbackend-obm7.onrender.com/api/products")
+    fetch(`${url}/api/products`)
       .then(response => response.json())
       .then(data => setProducts(data))
       .catch(error => console.error("Error fetching products:", error));
@@ -31,15 +32,20 @@ export default function ResponsiveGrid() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid
-        container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
+     <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          mr: 50,
+          ml: 50,
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+        }}
       >
         {products.map((product) => (
-          <Grid item xs={2} sm={4} md={3} key={product.id}>
+          <Grid item xs={2} sm={4} md={3} m={3} key={product.id}>
             <Item>
-              <Card sx={{ width: 320 }}>
+              <Card sx={{ width: 450, ml:18 }}>
                 <div>
                   <Typography level="title-lg">{product.name}</Typography>
                   <Typography level="body-sm">{product.description}</Typography>
@@ -57,8 +63,9 @@ export default function ResponsiveGrid() {
                     <BookmarkAdd />
                   </IconButton>
                 </div>
-                <AspectRatio minHeight="200px" maxHeight="200px">
+                <AspectRatio >
                   <img
+                    style={{width:"260px", marginLeft:"95px"}}
                     src={product.image}
                     srcSet={`${product.image} 2x`}
                     loading="lazy"
@@ -86,7 +93,7 @@ export default function ResponsiveGrid() {
             </Item>
           </Grid>
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 }
