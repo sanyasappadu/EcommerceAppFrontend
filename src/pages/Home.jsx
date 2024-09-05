@@ -1,3 +1,4 @@
+// src/Home.jsx
 import { useEffect, useState } from "react";
 import { experimentalStyled as styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -18,9 +19,10 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
   color: theme.palette.text.secondary,
 }));
-const url = "http://localhost:4000";
 
-export default function ResponsiveGrid() {
+const url = "https://ecommerceappbackend-obm7.onrender.com";
+// const url2 = "http://localhost:4000";
+export default function Home() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function ResponsiveGrid() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-     <Box
+      <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -63,7 +65,7 @@ export default function ResponsiveGrid() {
                     <BookmarkAdd />
                   </IconButton>
                 </div>
-                <AspectRatio >
+                <AspectRatio>
                   <img
                     style={{width:"260px", marginLeft:"95px"}}
                     src={product.image}

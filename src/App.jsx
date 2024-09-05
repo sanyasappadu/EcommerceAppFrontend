@@ -1,29 +1,43 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Navbar from "./components/NavBar";
-import Footer from "./components/Footer";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Home from "./pages/Home";
-import Wishlist from "./pages/Wishlist";
-import Cart from "./pages/Cart";
-import { AuthProvider } from "./AuthContext";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import Sidebar from './components/Sidebar';
+import ProductList from './pages/ProductList';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import UserProfile from './pages/UserProfile';
+import Navbar from './components/NavBar';
+import Cart from './pages/Cart';
+import ProductDetails from './pages/ProductDetails'; // Import ProductDetails
 
-function App() {
+const App = () => {
+  const { isLoggedIn, logout, user } = useAuth();
+
   return (
-    <AuthProvider>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/cart" element={<Cart />} />
-        </Routes>
-        <Footer />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <div className="app-container">
+        <Navbar user={user} onLogout={logout} />
+        <Sidebar />
+        <div className="content-container">
+          <Routes>
+            <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+            <Route path="/signup" element={isLoggedIn ? <Navigate to="/" /> : <Signup />} />
+            <Route path="/cart" element={isLoggedIn ? <Cart /> : <Navigate to="/login" />} />
+            <Route path="/profile" element={isLoggedIn ? <UserProfile /> : <Navigate to="/login" />} />
+            <Route path="/new-in" element={<ProductList category="New In" />} />
+            <Route path="/clothing" element={<ProductList category="Clothing" />} />
+            <Route path="/shoes" element={<ProductList category="Shoes" />} />
+            <Route path="/electronics" element={<ProductList category="Electronics" />} />
+            <Route path="/accessories" element={<ProductList category="Accessories" />} />
+            <Route path="/active-wear" element={<ProductList category="Active Wear" />} />
+            <Route path="/gifts-living" element={<ProductList category="Gifts & Living" />} />
+            <Route path="/productdetails/:id" element={<ProductDetails />} /> {/* Add this route */}
+            <Route path="/" element={<Navigate to="/new-in" />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;

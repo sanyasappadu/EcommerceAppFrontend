@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -11,38 +11,42 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { AuthContext } from '../AuthContext';
+import { useAuth } from '../AuthContext';
 
 const theme = createTheme();
 
 export default function Login() {
-  const { login, setUser } = useContext(AuthContext);
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const url = "http://localhost:4000";
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const loginData = { email, password };
     try {
-      const response = await fetch(`${url}/api/auth/login`, {
+      const response = await fetch('https://ecommerceappbackend-obm7.onrender.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(loginData),
       });
-      const data = await response.json();
-      console.log(data)
-      setUser(data)
-      if (response.ok) {
-        login();
-        navigate('/');
-      } else {
+
+      if (!response.ok) {
         const errorData = await response.json();
         console.error('Error:', errorData.message);
+        return;
       }
+
+      const data = await response.json();
+      const { user, token } = data;
+
+      // Update context with user data and token
+      login(user, token);
+
+      // Redirect to the home page
+      navigate('/');
     } catch (error) {
       console.error('Error:', error);
     }

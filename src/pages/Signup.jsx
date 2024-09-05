@@ -26,8 +26,8 @@ function Copyright(props) {
 }
 
 const defaultTheme = createTheme();
-const url = "http://localhost:4000";
-
+const url = "https://ecommerceappbackend-obm7.onrender.com";
+// const url2 = "http://localhost:4000";
 export default function SignUp() {
   const navigate = useNavigate();
 

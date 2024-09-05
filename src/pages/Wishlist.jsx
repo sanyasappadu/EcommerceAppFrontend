@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -5,9 +6,10 @@ import { useNavigate } from 'react-router-dom';
 function Wishlist() {
   const { isLoggedIn, user } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [wishlist, setWishlist] = useState([]);
-  const url = "http://localhost:4000";
-  
+  const url = "https://ecommerceappbackend-obm7.onrender.com";
+  // const url2 = "http://localhost:4000";  
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/');
@@ -17,10 +19,8 @@ function Wishlist() {
           const response = await fetch(`${url}/api/users/wishlist/${user._id}`);
           if (response.ok) {
             const data = await response.json();
+            console.log(data)
             setWishlist(data);
-            console.log();
-          } else {
-            console.error('Failed to fetch wishlist data');
           }
         } catch (error) {
           console.error('Error fetching wishlist data:', error);
@@ -28,18 +28,18 @@ function Wishlist() {
       };
       fetchWishlist();
     }
-  }, [isLoggedIn, navigate, user]);
+  }, []);
 
   return (
     <div>
       <h1>Wishlist</h1>
-      {/* <ul>
+      <ul>
         {wishlist.map((item) => (
           <li key={item._id}>
-            {item.product.name}
+            {item.name}
           </li>
         ))}
-      </ul> */}
+      </ul>
     </div>
   );
 }
