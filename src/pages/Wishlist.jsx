@@ -33,6 +33,7 @@ function Wishlist() {
   return (
     <div>
       <h1>Wishlist</h1>
+      <h2>your wishlist</h2>
       <ul>
         {wishlist.map((item) => (
           <li key={item._id}>
