@@ -6,17 +6,19 @@ const Cart = () => {
   const { isLoggedIn, user, token } = useAuth();
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
-  const url = "https://ecommerceappbackend-obm7.onrender.com";
-  console.log(user)
+  console.log(user.id)
   useEffect(() => {
     if (!isLoggedIn || !user || !token) {
       navigate('/login'); // Redirect to login if not logged in
       return;
     }
+    console.log(user.id)
 
     const fetchCart = async () => {
       try {
-        const response = await fetch(`${url}/api/users/cart/${user.id}`, {
+        console.log(user.id)
+
+        const response = await fetch(`https://ecommerceappbackend-obm7.onrender.com/api/users/cart/${user.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -44,7 +46,7 @@ const Cart = () => {
         {cartItems.length > 0 ? (
           cartItems.map((item) => (
             <li key={item.id}>
-              {item.product.name}
+              {item.product.price}
             </li>
           ))
         ) : (
@@ -56,4 +58,3 @@ const Cart = () => {
 };
 
 export default Cart;
-  

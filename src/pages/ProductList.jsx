@@ -1,65 +1,187 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../AuthContext'; // Import the custom hook
 import { Link } from 'react-router-dom';
+import { Card, CardHeader, CardMedia, CardContent, CardActions, IconButton, Typography, Avatar } from '@mui/material';
+import { red } from '@mui/material/colors';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShareIcon from '@mui/icons-material/Share';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const products = {
-  "New In": [
-    { id: 1, name: 'Product 1', price: '$100' },
-    { id: 2, name: 'Product 2', price: '$200' },
-  ],
-  "Clothing": [
-    { id: 3, name: 'Product 3', price: '$150' },
-    { id: 4, name: 'Product 4', price: '$250' },
-  ],
-  "Shoes": [
-    { id: 5, name: 'Product 5', price: '$300' },
-    { id: 6, name: 'Product 6', price: '$350' },
-  ],
-  "Accessories": [
-    { id: 7, name: 'Product 7', price: '$400' },
-    { id: 8, name: 'Product 8', price: '$450' },
-  ],
-  "Active Wear": [
-    { id: 9, name: 'Product 9', price: '$500' },
-    { id: 10, name: 'Product 10', price: '$550' },
-  ],
-  "Gifts & Living": [
-    { id: 11, name: 'Product 11', price: '$600' },
-    { id: 12, name: 'Product 12', price: '$650' },
-  ],
-  "Electronics": [
-    { id: 13, name: 'Product 13', price: '$300' },
-    { id: 14, name: 'Product 14', price: '$350' },
-  ],
-};
+const ProductList = () => {
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const ProductList = ({ category }) => {
+  const { selectedCategory } = useAuth(); // Get the selected category from context
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('https://ecommerceappbackend-obm7.onrender.com/api/products'); // Replace with your actual API endpoint
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
+        setProducts(data);
+        setFilteredProducts(data); // Initially show all products
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Filter products based on the selected category
+  useEffect(() => {
+    if (selectedCategory === 'All') {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter((product) => product.category === selectedCategory);
+      setFilteredProducts(filtered);
+    }
+  }, [selectedCategory, products]); // Run when selectedCategory or products change
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div>
-      <h2>{category}</h2>
-      <ul>
-        {products[category].map(product => (
-          <li key={product.id}>
-            <Link to={`/productdetails/${product.id}`}>
-              {product.name} - {product.price}
-            </Link>
-          </li>
+      <h1>Product List</h1>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+        {filteredProducts.map((product) => (
+          <Link key={product._id} to={`/product/${product._id}`} style={{ textDecoration: 'none' }}> {/* Link to ProductDetails with product ID */}
+            <Card sx={{ maxWidth: 345 }}>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                    {product.name[0]} {/* Show the first letter of the product name */}
+                  </Avatar>
+                }
+                action={
+                  <IconButton aria-label="settings">
+                    <ExpandMoreIcon />
+                  </IconButton>
+                }
+                title={product.name}
+                subheader={`Category: ${product.category}`}
+              />
+              <CardMedia
+                component="img"
+                height="194"
+                image={product.image || '/static/images/cards/paella.jpg'} // Fallback image
+                alt={product.name}
+              />
+              <CardContent>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  {product.description}
+                </Typography>
+              </CardContent>
+              <CardActions disableSpacing>
+                <IconButton aria-label="add to favorites">
+                  <FavoriteIcon />
+                </IconButton>
+                <IconButton aria-label="share">
+                  <ShareIcon />
+                </IconButton>
+                <IconButton aria-label="show more">
+                  <ExpandMoreIcon />
+                </IconButton>
+              </CardActions>
+            </Card>
+          </Link>
         ))}
-      </ul>
+      </div>
     </div>
   );
-}
-
-ProductList.propTypes = {
-  category: PropTypes.oneOf([
-    'New In',
-    'Clothing',
-    'Shoes',
-    'Accessories',
-    'Active Wear',
-    'Gifts & Living',
-    'Electronics'
-  ]).isRequired
 };
 
 export default ProductList;
+
+
+
+
+// import React, { useState, useEffect } from 'react';
+ 
+// const ProductList = () => {
+//   const [products, setProducts] = useState([]);
+//   const [filteredProducts, setFilteredProducts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [selectedCategory, setSelectedCategory] = useState('All');
+ 
+//   useEffect(() => {
+//     const fetchProducts = async () => {
+//       try {
+//         const response = await fetch('https://ecommerceappbackend-obm7.onrender.com/api/products'); // Replace with your actual API endpoint
+//         if (!response.ok) {
+//           throw new Error('Failed to fetch products');
+//         }
+//         const data = await response.json();
+//         setProducts(data);
+//         setFilteredProducts(data); // Initially show all products
+//       } catch (error) {
+//         setError(error.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+ 
+//     fetchProducts();
+//   }, []);
+ 
+//   const handleCategoryFilter = (category) => {
+//     setSelectedCategory(category);
+//     if (category === 'All') {
+//       setFilteredProducts(products);
+//     } else {
+//       const filtered = products.filter((product) => product.category === category);
+//       setFilteredProducts(filtered);
+//     }
+//   };
+ 
+//   if (loading) {
+//     return <div>Loading...</div>;
+//   }
+ 
+//   if (error) {
+//     return <div>Error: {error}</div>;
+//   }
+ 
+//   return (
+//     <div>
+//       <h1>Product List</h1>
+//       {/* Category Filter Buttons */}
+//       <div>
+//         <button onClick={() => handleCategoryFilter('All')}>All</button>
+//         <button onClick={() => handleCategoryFilter('electronic')}>Electronics</button>
+//         <button onClick={() => handleCategoryFilter('clothing')}>Clothes</button>
+//         <button onClick={() => handleCategoryFilter('activewear')}>Activewear</button>
+//         <button onClick={() => handleCategoryFilter('shoes')}>Shoes</button>
+//         {/* Add more buttons as needed */}
+//       </div>
+ 
+//       <ul>
+//         {filteredProducts.map((product) => (
+//           <li>
+//             <h2> {product.id}</h2>
+//             <h2>{product.name}</h2>
+//             <p>{product.description}</p>
+//             <p>Price: {product.price}</p>
+//             <p>Category: {product.category}</p>
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// };
+ 
+// export default ProductList;

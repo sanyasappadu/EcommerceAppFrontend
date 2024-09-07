@@ -46,7 +46,7 @@ export default function Login() {
       login(user, token);
 
       // Redirect to the home page
-      navigate('/');
+      navigate('/products');
     } catch (error) {
       console.error('Error:', error);
     }
