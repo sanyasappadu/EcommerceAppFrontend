@@ -1,123 +1,222 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useAuth } from '../AuthContext';
-
-const theme = createTheme();
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../AuthContext";
+import { API_URL } from '../config';
+// const url = "http://localhost:4000";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const loginData = { email, password };
+    setError("");
+    setLoading(true);
+
     try {
-      const response = await fetch('https://ecommerceappbackend-obm7.onrender.com/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error:', errorData.message);
-        return;
+      const result = await response.json();
+
+      if (response.ok) {
+        // ✅ Store token and user in localStorage
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user));
+
+        // ✅ Update AuthContext
+        login(result.user, result.token);
+
+        // ✅ Redirect based on role
+        if (result.user.role === "seller") {
+          navigate("/seller/dashboard");
+        } else {
+          navigate("/products");
+        }
+      } else {
+        setError(result.message || "Invalid email or password");
       }
-
-      const data = await response.json();
-      const { user, token } = data;
-
-      // Update context with user data and token
-      login(user, token);
-
-      // Redirect to the home page
-      navigate('/products');
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Log In
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
+    <div style={styles.page}>
+      <div style={styles.card}>
+        {/* Header */}
+        <div style={styles.header}>
+          <div style={styles.iconWrapper}>🔒</div>
+          <h1 style={styles.title}>Welcome Back</h1>
+          <p style={styles.subtitle}>Log in to your account</p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Email Address</label>
+            <input
+              type="email"
               required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
+              placeholder="john@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              style={styles.input}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Password</label>
+            <input
               type="password"
-              id="password"
-              autoComplete="current-password"
+              required
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              style={styles.input}
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Log In
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="/signup" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+          </div>
+
+          {/* Forgot Password */}
+          <div style={styles.forgotWrapper}>
+            <Link to="#" style={styles.forgotLink}>
+              Forgot password?
+            </Link>
+          </div>
+
+          {error && <p style={styles.error}>⚠️ {error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              ...styles.submitBtn,
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "Logging in..." : "Log In"}
+          </button>
+        </form>
+
+        <p style={styles.signupText}>
+          Don't have an account?{" "}
+          <Link to="/signup" style={styles.signupLink}>
+            Sign Up
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }
+
+const styles = {
+page: {
+  flexGrow: 1,           // ✅ instead of minHeight: '100vh'
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '40px 20px',
+  fontFamily: "'Segoe UI', sans-serif",
+},
+  card: {
+    background: "#fff",
+    borderRadius: "16px",
+    padding: "40px",
+    width: "100%",
+    maxWidth: "420px",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: "28px",
+  },
+  iconWrapper: {
+    fontSize: "32px",
+    marginBottom: "8px",
+  },
+  title: {
+    fontSize: "26px",
+    fontWeight: "700",
+    color: "#1a1a2e",
+    margin: "0 0 6px",
+  },
+  subtitle: {
+    color: "#888",
+    fontSize: "14px",
+    margin: 0,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "16px",
+  },
+  inputGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+  },
+  label: {
+    fontSize: "13px",
+    fontWeight: "600",
+    color: "#444",
+  },
+  input: {
+    padding: "12px 14px",
+    border: "1.5px solid #e5e7eb",
+    borderRadius: "8px",
+    fontSize: "14px",
+    outline: "none",
+    color: "#1a1a2e",
+  },
+  forgotWrapper: {
+    textAlign: "right",
+    marginTop: "-8px",
+  },
+  forgotLink: {
+    fontSize: "13px",
+    color: "#667eea",
+    textDecoration: "none",
+    fontWeight: "500",
+  },
+  error: {
+    color: "#e53e3e",
+    fontSize: "13px",
+    background: "#fff5f5",
+    padding: "10px 14px",
+    borderRadius: "8px",
+    margin: 0,
+  },
+  submitBtn: {
+    padding: "13px",
+    background: "linear-gradient(135deg, #667eea, #764ba2)",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontWeight: "700",
+    marginTop: "4px",
+    transition: "opacity 0.2s",
+  },
+  signupText: {
+    textAlign: "center",
+    marginTop: "20px",
+    fontSize: "14px",
+    color: "#888",
+  },
+  signupLink: {
+    color: "#667eea",
+    fontWeight: "600",
+    textDecoration: "none",
+  },
+};

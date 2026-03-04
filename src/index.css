@@ -1,52 +1,43 @@
-/* index.css */
-.app-container {
-  display: flex;
-}
-
-.sidebar {
-  width: 200px;
-  background-color: #f8f8f8;
-  padding: 20px;
-}
-
-.content-container {
-  padding: 20px;
-  flex: 1;
-}
-
-ul {
-  list-style-type: none;
+* {
+  margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-li {
-  margin: 10px 0;
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f3f4f6;
+  color: #1a1a2e;
+  min-height: 100vh;
 }
 
-a {
-  text-decoration: none;
-  color: #333;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-.navbar {
-  background-color: #f8f8f8;
-  padding: 10px;
-}
-
-.navbar ul {
+#root {
   display: flex;
-  list-style-type: none;
-  padding: 0;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.navbar li {
-  margin-right: 20px;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.navbar button {
-  cursor: pointer;
+input::placeholder {
+  color: hsla(0, 0%, 100%, 0.60);
 }
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+</style>
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #764ba2; }
